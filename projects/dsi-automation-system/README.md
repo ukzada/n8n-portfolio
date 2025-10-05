@@ -82,4 +82,18 @@ Handles all incoming requests:
 ---
 
 ## 📁 Folder Structure
+dsi-automation-system/
+├── README.md # Project documentation
+├── workflow.json # Exported n8n workflow
+├── diagram.png # Workflow screenshot (uploaded)
+├── modules/
+│ ├── email_setup.json
+│ ├── pdf_generation.json
+│ ├── lead_management.json
+│ ├── referral_system.json
+│ ├── follow_up.json
+└── docs/
+├── ai_manager_explained.md
+├── setup_instructions.md
+└── api_keys_config.md
 
