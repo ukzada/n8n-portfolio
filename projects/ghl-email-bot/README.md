@@ -1,4 +1,4 @@
-# GHL Email Bot
+# Github Flows
 
 An intelligent email automation bot for GoHighLevel (GHL) platform that manages email campaigns, lead nurturing, and customer communication workflows.
 
