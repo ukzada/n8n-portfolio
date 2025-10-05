@@ -1,0 +1,227 @@
+{
+  "name": "Payment",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        208
+      ],
+      "id": "3482c9a8-ee85-4194-9f17-c8640465028a",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZL4QchrYddYTNjoe",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "price_amount",
+              "type": "number"
+            },
+            {
+              "name": "order_id",
+              "type": "any"
+            },
+            {
+              "name": "order_description"
+            },
+            {
+              "name": "customer_email"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -112,
+        -16
+      ],
+      "id": "bb77f155-b033-4b98-8da4-779ad5052aba",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2b5f4860-9f52-446b-b0e1-d85faa04ed7d",
+              "name": "price_amount",
+              "value": "={{ $json.price_amount }}",
+              "type": "string"
+            },
+            {
+              "id": "54cecd9f-595c-4b99-ab53-4cdd9c51297e",
+              "name": "order_id",
+              "value": "={{ $json.order_id }}",
+              "type": "string"
+            },
+            {
+              "id": "bc4df69a-d8c0-472a-ace3-5948fb42c977",
+              "name": "order_description",
+              "value": "={{ $json.order_description }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        -16
+      ],
+      "id": "114b4d5b-e313-47cb-8933-289b1c901a39",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.price_amount }}{{ $json.order_id }}{{ $json.order_description }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        -16
+      ],
+      "id": "bd0f1040-02f4-4c54-afeb-a04c358e4ce8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.nowpayments.io/v1/payment",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "Y6764EE-TZ4M99P-K6TY1S6-60Y2PSB"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "price_amount",
+              "value": "={{ $('When Executed by Another Workflow').item.json.price_amount }}"
+            },
+            {
+              "name": "price_currency",
+              "value": "usd"
+            },
+            {
+              "name": "pay_currency",
+              "value": "btc"
+            },
+            {
+              "name": "ipn_callback_url",
+              "value": "https://nowpayments.io"
+            },
+            {
+              "name": "order_id",
+              "value": "={{ $('When Executed by Another Workflow').item.json.order_id }}"
+            },
+            {
+              "name": "order_description",
+              "value": "={{ $('When Executed by Another Workflow').item.json.order_description }}"
+            },
+            {
+              "name": "customer_email",
+              "value": "={{ $('When Executed by Another Workflow').item.json.customer_email }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        752,
+        -16
+      ],
+      "id": "dc42f0ab-bd05-4259-8eba-a88a03b949db",
+      "name": "HTTP Request2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b65f545b-7797-4253-a697-93ab8d8d9034",
+  "meta": {
+    "instanceId": "ad11e8c4392b848ffa61ea18deac972feac6489a85aba293e13653c89088ead0"
+  },
+  "id": "2OXqKsF8UAw2Wu0w",
+  "tags": []
+}

@@ -1,0 +1,223 @@
+{
+  "name": "pdf",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        224
+      ],
+      "id": "56b69e72-8a4b-495a-b78f-0ea4a69f5b63",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZL4QchrYddYTNjoe",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chat_id",
+              "type": "any"
+            },
+            {
+              "name": "discussion"
+            },
+            {
+              "name": "Topic",
+              "type": "any"
+            },
+            {
+              "name": "First_name"
+            },
+            {
+              "name": "Last_name"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "phone_number",
+              "type": "number"
+            },
+            {
+              "name": "summary",
+              "type": "any"
+            },
+            {
+              "name": "payment_history"
+            },
+            {
+              "name": "credit_age"
+            },
+            {
+              "name": "inquiries"
+            },
+            {
+              "name": "credit_utilization"
+            },
+            {
+              "name": "credit_mix"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -960,
+        0
+      ],
+      "id": "233ea8c0-ce89-4e14-ba4c-fcc868b51f8f",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chat_id }}{{ $json.discussion }}{{ $json.Topic }}{{ $json.First_name }}{{ $json.Last_name }}{{ $json.email }}{{ $json.phone_number }}{{ $json.summary }}{{ $json.payment_history }}{{ $json.credit_age }}{{ $json.inquiries }}{{ $json.credit_utilization }}{{ $json.credit_mix }}",
+        "options": {
+          "systemMessage": "=You are the PDF Generator Agent.  \nYour role is to take structured credit data, client details, and analysis text from another AI agent and fill them into a fixed HTML template for PDF generation.  \n\nGuidelines:  \n- Always output only valid HTML — no extra text, no explanations.  \n- Use the provided HTML structure with placeholders and replace them with actual values from the input.  \n- If a value is missing, leave it blank (do not write \"null\").  \n- Assume the HTML will be converted into a PDF.  \n- Insert the provided analysis text into the {{summary}} field.  \n- Insert the PDF download link in {{pdf_url}}.  \n- Keep formatting clean, professional, and business-ready.  \n\nTemplate to use (replace {{placeholders}} with input values):\n\n<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\" />\n  <title>Credit Analysis Report — Super Jugga Labs</title>\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\" />\n  <style>\n    :root{\n      --brand:#0b63d6;\n      --muted:#6b7280;\n      --bg:#ffffff;\n      --card:#f8fafc;\n      --text:#111827;\n      --accent:#0b63d6;\n      --maxw:760px;\n    }\n    html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family:Inter,Helvetica,Arial,sans-serif;color:var(--text);}\n    .wrap{max-width:var(--maxw);margin:28px auto;padding:28px;}\n    header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e6eef8;padding-bottom:12px;margin-bottom:18px}\n    .brand{display:flex;gap:12px;align-items:center}\n    .logo{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--brand),#2fb4ff);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:18px}\n    .title{font-size:18px;font-weight:700}\n    .meta{font-size:12px;color:var(--muted);text-align:right}\n    .section{margin:18px 0}\n    h2{font-size:16px;margin:8px 0 10px}\n    p.lead{margin:0 0 8px;color:var(--muted)}\n    .card{background:var(--card);border-radius:8px;padding:14px;border:1px solid #eef6ff}\n    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}\n    .kv{font-size:14px}\n    .kv strong{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}\n    ul.recs{margin:8px 0 0;padding-left:18px}\n    footer{border-top:1px solid #eef6ff;margin-top:22px;padding-top:10px;color:var(--muted);font-size:12px}\n    .cta{display:inline-block;background:var(--accent);color:#fff;padding:10px 14px;border-radius:6px;text-decoration:none;font-weight:600;margin-top:10px}\n    @media print{\n      .wrap{margin:6mm}\n      .logo{box-shadow:none}\n      a.cta{display:none}\n    }\n  </style>\n</head>\n<body>\n  <div class=\"wrap\">\n    <header>\n      <div class=\"brand\">\n        <div class=\"logo\">sjlabs</div>\n        <div>\n          <div class=\"title\">Super Jugga Labs</div>\n          <div style=\"font-size:12px;color:var(--muted)\">Credit Analysis Report</div>\n        </div>\n      </div>\n      <div class=\"meta\">\n        Generated: {{date}}<br/>\n        Report ID: {{order_id}}\n      </div>\n    </header>\n\n    <section class=\"section\">\n      <div style=\"display:flex;justify-content:space-between;align-items:flex-start;gap:16px\">\n        <div>\n          <h2>Client</h2>\n          <p class=\"lead\"><strong>{{first_name}} {{last_name}}</strong><br/>{{email}} • {{phone}}</p>\n        </div>\n        <div style=\"text-align:right\">\n          <h2>Score Snapshot</h2>\n          <p class=\"lead\"><strong>{{score}}</strong><br/><span style=\"color:var(--muted)\">FICO-style range</span></p>\n        </div>\n      </div>\n    </section>\n\n    <section class=\"section\">\n      <h2>Key Highlights</h2>\n      <div class=\"card\">\n        <div class=\"grid\">\n          <div class=\"kv\">\n            <strong>Payment History</strong>\n            {{$json.payment_history}}\n          </div>\n          <div class=\"kv\">\n            <strong>Credit Utilization</strong>\n            {{$json.credit_utilization}}\n          </div>\n          <div class=\"kv\">\n            <strong>Credit Age</strong>\n            {{$json.credit_age}}\n          </div>\n          <div class=\"kv\">\n            <strong>Credit Mix</strong>\n            {{$json.credit_mix}}\n          </div>\n          <div class=\"kv\" style=\"grid-column:1 / -1\">\n            <strong>Inquiries</strong>\n            {{$json.inquiries}}\n          </div>\n        </div>\n      </div>\n    </section>\n\n    <section class=\"section\">\n      <h2>Summary</h2>\n      <div class=\"card\">\n        <p style=\"margin:0\">{{$json.summary}}</p>\n      </div>\n    </section>\n\n    <section class=\"section\">\n      <h2>Recommendations</h2>\n      <div class=\"card\">\n        <ul class=\"recs\">\n          <li>Pay down or settle charge-offs and collections</li>\n          <li>Keep utilization below 30%</li>\n          <li>Avoid unnecessary credit inquiries</li>\n          <li>Work on building positive tradelines</li>\n        </ul>\n        <p style=\"margin-top:12px;color:var(--muted)\">Suggested service: <strong>Credit Sweep ($500)</strong> — helps remove negatives faster.</p>\n      </div>\n    </section>\n\n    <section class=\"section\">\n      <h2>Referral & Next Steps</h2>\n      <div class=\"card\">\n        <p style=\"margin:0\">Referral Bonus: Invite friends and get <strong>5% off</strong> services. To proceed with services or to request the full dispute/cleanup package, reply or visit our onboarding form.</p>\n        <p style=\"margin-top:10px\">\n          <a class=\"cta\" href=\"{{pdf_url}}\" target=\"_blank\" rel=\"noopener\">Download PDF</a>\n        </p>\n      </div>\n    </section>\n\n    <footer>\n      Super Jugga Labs • Email: support@sjlabs.dev • Website: https://sjlabs.dev<br/>\n      This report is for informational purposes and not a credit score guarantee. For personalized legal/financial advice, consult a certified professional.\n    </footer>\n  </div>\n</body>\n</html>\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -624,
+        0
+      ],
+      "id": "cb4d4f30-b614-4655-9842-a45141f2bbdc",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pdf.co/v1/pdf/convert/from/html",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "uk0501126@gmail.com_M44JqxBQzp1vP7yLKSpq8OiMX7PNIoau8Bee3vYb4FCPYcjOR6Mm1YvNB2Bcg1GF"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "html",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "name",
+              "value": "result.pdf"
+            },
+            {
+              "name": "margins",
+              "value": "5px 5px 5px 5px"
+            },
+            {
+              "name": "paperSize",
+              "value": "Letter"
+            },
+            {
+              "name": "orientation",
+              "value": "Portrait"
+            },
+            {
+              "name": "printBackground",
+              "value": "true"
+            },
+            {
+              "name": "header"
+            },
+            {
+              "name": "footer"
+            },
+            {
+              "name": "mediaType",
+              "value": "print"
+            },
+            {
+              "name": "async",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "62e41e6d-5c35-4e3f-80a5-fc2e8745aed6",
+      "name": "HTTP Request2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7666b4af-3b9b-4916-9a5d-239ddfd19f4f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ad11e8c4392b848ffa61ea18deac972feac6489a85aba293e13653c89088ead0"
+  },
+  "id": "OdYDaZC6FIYZs9c0",
+  "tags": []
+}

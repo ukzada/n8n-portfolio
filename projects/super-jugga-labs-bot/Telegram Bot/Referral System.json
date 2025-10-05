@@ -1,0 +1,283 @@
+{
+  "name": "reffaral system",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chat_id"
+            },
+            {
+              "name": "First_name"
+            },
+            {
+              "name": "Last_name"
+            },
+            {
+              "name": "Email"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1568,
+        208
+      ],
+      "id": "d252bcea-3b18-4bca-a92c-58e2b199597a",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.email }}{{ $json['first name'] }}{{ $json['last name '] }}",
+        "options": {
+          "systemMessage": "You are a referral system logic engine.\nInput: Action type: , Referral count: , Purchase amount: .\nRules:\n- New signup = 5 credits\n- Referrer gets 10 credits per signup\n- Purchases add 20% of purchase as credits\n- After 5 referrals, increase reward to 15 credits\n- After 20 referrals, increase to 25 credits\nOutput JSON: { \"credits_awarded\": <number> }\nYou are also responsible for generating referral codes.\nInput: username=, user_id=\nRule: Generate a short, unique, lowercase alphanumeric code (6–8 chars).\nOutput JSON: { \"referral_code\": \"<code>\" }\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -992,
+        208
+      ],
+      "id": "c279214a-de4f-45bd-bff6-b0f5475230d5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "36d84fbb-2525-4b28-b867-0993deecb599",
+              "name": "email",
+              "value": "={{ $json.Email }}",
+              "type": "string"
+            },
+            {
+              "id": "cb7db104-647d-4e82-98f3-6a4630a5c82d",
+              "name": "first name",
+              "value": "={{ $json.First_name }}",
+              "type": "string"
+            },
+            {
+              "id": "86bbeba4-33a7-4c2a-b676-e4632a8a0ddf",
+              "name": "last name ",
+              "value": "={{ $json.Last_name }}",
+              "type": "string"
+            },
+            {
+              "id": "b5a94ac3-5a78-40c9-a201-604d558b021e",
+              "name": "chat_id",
+              "value": "={{ $json.chat_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1344,
+        208
+      ],
+      "id": "e151b74d-7756-44ba-8936-15a28e7da36f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1120,
+        432
+      ],
+      "id": "255c54f0-f243-486d-aaae-2dff0503ad20",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZL4QchrYddYTNjoe",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Edit Fields').item.json.chat_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -992,
+        432
+      ],
+      "id": "ff712b54-b3e6-4c36-8c0a-c0ef13a16033",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "fromEmail": "service@sjlabs.dev",
+        "toEmail": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To_Email', ``, 'string') }}",
+        "subject": "Your Affiliated Link ",
+        "emailFormat": "text",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSendTool",
+      "typeVersion": 2.1,
+      "position": [
+        -1568,
+        752
+      ],
+      "id": "d61213db-bbba-457d-8642-323e59682345",
+      "name": "Send email in Send Email1",
+      "webhookId": "cc150df1-d3cb-449e-92ad-fba341e34070",
+      "credentials": {
+        "smtp": {
+          "id": "HlENZMYGqQHHfcPl",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Document', ``, 'string') }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Sheet', ``, 'string') }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -736,
+        432
+      ],
+      "id": "821e22f3-f5d4-4436-a63b-bfa6062f0179",
+      "name": "Append or update row in sheet in Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HruLKU81RosPCn1P",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        -864,
+        432
+      ],
+      "id": "ad893bbb-b465-4e02-8cb0-6d96452379a6",
+      "name": "Think"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet in Google Sheets1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dc1d9342-ec9b-4c89-9f42-875d264ad4b4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ad11e8c4392b848ffa61ea18deac972feac6489a85aba293e13653c89088ead0"
+  },
+  "id": "5E7jXwMLVXoAA6vM",
+  "tags": []
+}
