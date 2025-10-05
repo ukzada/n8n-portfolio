@@ -1,0 +1,1395 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {
+          "download": false
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -448,
+        184
+      ],
+      "id": "48d64da3-54bb-4a21-998f-c11b76297a59",
+      "name": "Telegram Trigger",
+      "webhookId": "1e150174-9988-4937-8736-ef9322b75a65",
+      "credentials": {
+        "telegramApi": {
+          "id": "3Y6O7MtjJ3II0QhA",
+          "name": "test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "01306046-a5c2-4365-be98-31b9b92a8b7d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "menu_text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3bd458cf-0939-4496-a5ea-28590f03c293",
+                    "leftValue": "={{ $json.callback_query.data }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "callback"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7fa206eb-825b-45a1-b44b-c425dfee7c35",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cb8a8e8c-a4f6-4394-bf1b-9501306e6595",
+                    "leftValue": "={{ $json.message.document.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "388df2e8-eba4-48b6-aa4d-ec2b695b81e3",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -224,
+        136
+      ],
+      "id": "a27e6374-8b04-4ed1-b791-abb2be475bd6",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        192
+      ],
+      "id": "f087e372-5ba3-4dd0-9859-990c544d08c0",
+      "name": "Get a file",
+      "webhookId": "63cbef02-874b-4089-a7e7-4b7491d22b18",
+      "credentials": {
+        "telegramApi": {
+          "id": "3Y6O7MtjJ3II0QhA",
+          "name": "test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        224,
+        192
+      ],
+      "id": "ff018931-3286-4163-acc5-49269ce89273",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZL4QchrYddYTNjoe",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        384
+      ],
+      "id": "3a307f7d-d850-4eac-b996-5eb0f0cb4b58",
+      "name": "file",
+      "webhookId": "d31c508a-586a-401c-8656-0e9813baea31",
+      "credentials": {
+        "telegramApi": {
+          "id": "3Y6O7MtjJ3II0QhA",
+          "name": "test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        224,
+        384
+      ],
+      "id": "ac49173a-2f3f-4120-a82b-723943d788c0",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "497c60d4-94dc-4de3-afb6-cb278fff7057",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        -56
+      ],
+      "id": "b9957757-b5e3-404f-8b85-dc3b6ffbf465",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=={{ $json.text }}",
+        "options": {
+          "systemMessage": "{\n  \"role\": \"You are Super Jugga Labs bot – a professional AI credit assistant helping users improve their credit scores, retrieve reports, and guide them through credit repair and business setup. Your role includes lead collection, education, personalized analysis of U.S. credit reports (FICO), upsells, referrals, payments, PDF generation, and follow-ups.\",\n\n  \"communication_flow\": [\n    \"👋 1. Introduce yourself: 'Hello! I’m Super Jugga Labs Bot – your professional AI credit coach. I’m here to help you check, repair, and grow your credit score 📈.'\",\n\n    \"🎁 2. Offer a FREE credit analysis and ask for their **full name, phone number, and email**.\",\n    \"👉 Ask if they have a referral code. If yes, validate and apply discount/reward. If no, continue without discount.\",\n\n    \"📚 3. Educate on the 5 FICO score factors (U.S. Standards):\",\n    \"- ✅ Payment history – 35%\",\n    \"- 📉 Credit utilization – keep under 30% (30%)\",\n    \"- ⏳ Credit age – 15%\",\n    \"- 🔄 Credit mix – 10%\",\n    \"- 🆕 New inquiries – 10%\",\n\n    \"📊 4. Explain credit score ranges clearly:\",\n    \"- 300–579: Poor 🚨\",\n    \"- 580–669: Fair ⚠️\",\n    \"- 670–739: Good 🙂\",\n    \"- 740–799: Very Good 👍\",\n    \"- 800–850: Excellent 🌟\",\n\n    \"✍️ 5. After collecting info, confirm:\",\n    \"‘Thank you! I’ve saved your details ✅ You’ll receive your FREE detailed credit analysis shortly. 📩 Watch your inbox!’\",\n\n    \"🔗 6. Guide to MyScoreIQ signup:\",\n    \"‘Next step: Sign up at MyScoreIQ and download your credit report (PDF).’\",\n    \"👉 https://www.myscoreiq.com/industry-score-max.aspx?offercode=432138U6\",\n\n    \"📥 7. Ask them to upload their report:\",\n    \"‘Once you have your credit report, please upload it here in the chat. I’ll review it and send you a detailed analysis.’\",\n\n    \"🧠 8. Upon receiving the credit report:\",\n    \"- Review based on FICO standards.\",\n    \"- Identify payment history, utilization, age, mix, and inquiries.\",\n    \"- Highlight negative marks (late payments, collections, high utilization).\",\n    \"- Give **clear, actionable steps** to increase score (e.g., pay down balances, keep utilization < 30%, avoid new inquiries, add positive tradelines).\",\n\n    \"📤 9. Ask delivery preference:\",\n    \"‘Would you like your analysis sent via email 📧, directly here in Telegram 💬, or as a downloadable PDF 📄?’\",\n\n    \"📄 10. If user asks for PDF format:\",\n    \"- Accept the **report file** as input.\",\n    \"- Send all available analysis data + uploaded file to **PDF_Generator_Node**.\",\n    \"- Return a secure **download link** for the generated PDF.\",\n\n    \"💸 11. Begin upsell messaging:\",\n    \"- 🔧 Credit Sweep – $500 (remove negatives)\",\n    \"- 🚀 Biz In A Box packages:\",\n    \"* Shoe Box – $1,100\",\n    \"* Boom Box – $2,000\",\n    \"* Auto Box – $5,000\",\n    \"👉 When the user agrees to purchase, call **Payment_Node** to process the transaction.\",\n\n    \"📨 12. Share service onboarding form:\",\n    \"👉 https://docs.google.com/forms/d/e/1FAIpQLSfgjiNtJ2cIIBW9UwK0FmFQIZvV8hyr84SyYe2pSfZevUAAcA/viewform\",\n\n    \"📎 13. Affiliate links:\",\n    \"🔗 https://affiliate.upsellnation.com/scripts/x7y3nqcm?a_aid=6793dec0c4a6b&a_bid=f2b95cf9\",\n    \"🔗 https://member.myscoreiq.com/industry-score-max.aspx?offercode=432138U6\",\n\n    \"📣 14. Encourage social follows:\",\n    \"- Instagram: https://www.instagram.com/superjugga?igsh=eHl2emhwZ2M0aTJs\",\n    \"- Facebook: https://www.facebook.com/share/1ZmcuSzPCM/\",\n    \"- YouTube: https://youtube.com/@superjuggalabs?si=2m7NmdCGnqKjgsGS\",\n    \"- X (Twitter): https://x.com/SJLabss?t=2PQ7NxpNlnore6f7jXvB6g&s=09\",\n\n    \"🎁 15. Referral reward system:\",\n    \"‘💰 Invite your friends to use this bot! For every person you refer, you’ll get **5% off** your services. Share your referral today and start saving!’\",\n    \"👉 Referral Flow Rules:\",\n    \"- When a new user joins, ask if they have a referral code.\",\n    \"- If valid, update the referrer’s rewards in Google Sheet.\",\n    \"- Generate a **unique referral code** for each new user (format: 6-char alphanumeric).\",\n    \"- Save referral codes in the sheet with mapping: {referrer_email → code, total_referrals, rewards}.\",\n    \"- Each successful referral = 5% discount credit.\",\n    \"- Users can check rewards anytime by asking: ‘Check my referral rewards’ → bot fetches from Google Sheet.\",\n    \"- Referral discounts can be applied at checkout automatically by Payment_Node.\",\n\n    \"📧 16. Trigger follow-up via email/SMS:\",\n    \"- Analysis delivery confirmation 📄\",\n    \"- Upsell reminders 💸\",\n    \"- Referral reward updates 🎁\",\n    \"- Credit-building eBooks launch 📘\",\n\n    \"📘 17. Promote upcoming products:\",\n    \"‘Stay tuned! Soon, we’ll offer powerful credit-building eBooks through this bot.’\",\n\n    \"🚫 18. Off-topic requests:\",\n    \"‘I can only assist with credit checks, repair strategies, score increases, and business setup. Please keep your questions credit-related 👍.’\"\n  ],\n\n  \"return_json\": {\n    \"email\": \"user@example.com\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n  },\n\n  \"flowCalling\": {\n    \"call Referral_Node\": {\n      \"inputs\": [\"email\", \"first_name\", \"last_name\", \"referral_code\"]\n    },\n    \"call Payment_Node\": {\n      \"inputs\": [\"email\", \"amount\", \"service\", \"discount_applied\"]\n    },\n    \"call PDF_Generator_Node\": {\n      \"inputs\": [\"email\", \"first_name\", \"last_name\", \"analysis_data\", \"report_file\"]\n    },\n    \"call Referral_Update_Node\": {\n      \"inputs\": [\"referrer_email\", \"new_user_email\", \"referral_code\", \"reward_points\"]\n    },\n    \"call Referral_Check_Node\": {\n      \"inputs\": [\"email\"]\n    }\n  },\n\n  \"email_template\": {\n    \"subject\": \"📊 Your Credit Analysis Report – Super Jugga Labs\",\n    \"body\": \"Hello {{first_name}},<br><br>Thank you for trusting Super Jugga Labs with your credit journey. Attached is your **detailed credit analysis report** based on FICO standards.<br><br><b>Key Highlights:</b><br>• Payment History: {{payment_history}}%<br>• Credit Utilization: {{utilization}}%<br>• Credit Age: {{credit_age}} years<br>• Credit Mix: {{credit_mix}}<br>• Inquiries: {{inquiries}}<br><br><b>Recommendations to Improve Your Score:</b><br>✅ Pay bills on time<br>✅ Keep utilization below 30%<br>✅ Avoid unnecessary inquiries<br>✅ Build positive tradelines<br><br>💡 With our Credit Sweep ($500), you can remove negatives faster. Or check out our Biz In A Box packages to level up your business and credit together.<br><br>🎁 <b>Referral Bonus:</b> Add 1 person = 5% discount on your service. Invite friends & save!<br><br>You can also check your referral rewards anytime by typing: <b>Check my referral rewards</b> in the bot.<br><br>Thank you again for joining Super Jugga Labs. Together, we’ll get your credit score climbing 📈.<br><br>Best regards,<br><b>Super Jugga Labs Team</b>\"\n  }\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1176,
+        312
+      ],
+      "id": "e120dd68-1e7b-4023-a360-ae68143a25d6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        864,
+        656
+      ],
+      "id": "adb8ecaf-2bcd-41eb-92ba-1904b793c6dc",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZL4QchrYddYTNjoe",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=={{ $('Telegram Trigger').item.json.message?.chat?.id || $('Telegram Trigger').item.json.callback_query?.message?.chat?.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        672
+      ],
+      "id": "579191f0-5421-4207-a4da-c0c130701cf7",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "fromEmail": "service@sjlabs.dev",
+        "toEmail": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To_Email', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailFormat": "text",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSendTool",
+      "typeVersion": 2.1,
+      "position": [
+        1216,
+        672
+      ],
+      "id": "d2c5183a-61e3-4a17-af97-4c2587cfc225",
+      "name": "Send email in Send Email",
+      "webhookId": "895ec628-0fe5-4969-8b7b-1e0ed92e087f",
+      "credentials": {
+        "smtp": {
+          "id": "HlENZMYGqQHHfcPl",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message?.chat?.id || $('Telegram Trigger').item.json.callback_query?.message?.chat?.id }}\n",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2032,
+        312
+      ],
+      "id": "7fdff0aa-b80f-4ac6-8706-a7fd8fbc130e",
+      "name": "Send a text message",
+      "webhookId": "1d34ff66-cf16-4eda-b6cd-5a1cf4eee6a8",
+      "credentials": {
+        "telegramApi": {
+          "id": "3Y6O7MtjJ3II0QhA",
+          "name": "test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$('Telegram Trigger').item.json.message.chat.id}}",
+        "text": "=Choose an option:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Upload Report",
+                    "additionalFields": {
+                      "callback_data": "upload_report"
+                    }
+                  },
+                  {
+                    "text": "About Us",
+                    "additionalFields": {
+                      "callback_data": "about_us"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Payment",
+                    "additionalFields": {
+                      "callback_data": "payment"
+                    }
+                  },
+                  {
+                    "text": "Help",
+                    "additionalFields": {
+                      "callback_data": "help"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -96
+      ],
+      "id": "3ea0c4a7-6f36-4890-b3bf-8f5cb1590ef0",
+      "name": "Send Menu",
+      "webhookId": "1d34ff66-cf16-4eda-b6cd-5a1cf4eee6a8",
+      "credentials": {
+        "telegramApi": {
+          "id": "3Y6O7MtjJ3II0QhA",
+          "name": "test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "upload_report",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "762de22a-d082-4028-b378-33f6ecd45eab"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "upload"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cc2f4718-3b7d-4579-a23b-6a0bccb8e00b",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "about_us",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "referral"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2658fd15-b5fe-4d3f-878b-e547962a8839",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "payment",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "payment"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "185a5649-bf7d-4b4e-906d-04f106a49227",
+                    "leftValue": "={{$json.callback_query.data}}",
+                    "rightValue": "help",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "help"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        224,
+        600
+      ],
+      "id": "406ba68a-aeaa-4dca-bbe1-7b1998e8f8b8",
+      "name": "Callback Router"
+    },
+    {
+      "parameters": {
+        "resource": "callback",
+        "queryId": "={{$json.callback_query.id}}",
+        "additionalFields": {
+          "show_alert": false,
+          "text": "Working on it…"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        680
+      ],
+      "id": "a2b6db17-a6f2-49dc-955c-079e4638a4e0",
+      "name": "Answer Query a callback",
+      "webhookId": "4136c71e-f3c0-419e-b1ec-5671dd3a9325",
+      "credentials": {
+        "telegramApi": {
+          "id": "3Y6O7MtjJ3II0QhA",
+          "name": "test"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function node before AI Agent — normalize inputs\nreturn [{\n  json: {\n    text:\n      $json.text                                   // plain text path\n      || $json.transcription                       // if your STT node uses \"transcription\"\n      || $json.output                              // if an upstream tool produced \"output\"\n      || ($json.callback_query && $json.callback_query.data) // button callback\n      || ($json.message && $json.message.text)     // raw Telegram text fallback\n      || ''\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        312
+      ],
+      "id": "45f12719-4262-4066-92d1-22cd2aab8329",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "description": "You are the Think Tool for this workflow.  \nYour job is to analyze the current context and decide the correct next step.  \nYou never talk to the end user; instead, you return structured instructions for the workflow.\n\nYour possible responsibilities:\n1. **PDF Generation** – If the user requests a credit analysis, report, or document, call the PDF Sub-Workflow and pass **all available analysis data as-is** to generate the report. Do not reformat or enforce a specific structure.  \n2. **Payment Processing** – If the user wants to buy a service, call the Payment Sub-Workflow. Provide payment details (amount, currency, order_id, description, customer_email). Wait for payment status and confirm.  \n3. **Referral System** – If the user mentions a referral or discount code, call the Referral Sub-Workflow. Pass referral details (referrer_email, referred_email, discount). Record the referral and return the discount eligibility.  \n\nRules:\n- Always return a JSON object with:  \n  - `thought_text`: short reasoning about the user request.  \n  - `decision`: what action to take (`generate_pdf`, `process_payment`, `handle_referral`, or `ask_clarification`).  \n  - `action_payload`: the exact data the sub-workflow needs.  \n- Keep `decision` short and machine-readable.  \n- If information is missing (e.g., no email for PDF, no amount for payment), set `decision = \"ask_clarification\"`.  \n- Do not include sensitive data like card numbers.  \n- Only one decision per thought.  \n\nOutput schema example:\n{\n  \"thought_text\": \"User requested a $500 Credit Sweep payment.\",\n  \"decision\": \"process_payment\",\n  \"action_payload\": {\n    \"price_amount\": 500,\n    \"price_currency\": \"usd\",\n    \"pay_currency\": \"btc\",\n    \"order_id\": \"CSWEEP-23984\",\n    \"order_description\": \"Credit Sweep Service\",\n    \"customer_email\": \"john@example.com\"\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        1376,
+        672
+      ],
+      "id": "45acb1f2-e8b1-4e67-ad88-225000a8df07",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "OdYDaZC6FIYZs9c0",
+          "mode": "list",
+          "cachedResultName": "pdf"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "discussion": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('discussion', ``, 'string') }}",
+            "Topic": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Topic', ``, 'string') }}",
+            "First_name": "={{ $('Telegram Trigger').item.json.message.chat.first_name }}",
+            "Last_name": "={{ $('Telegram Trigger').item.json.message.from.last_name }}",
+            "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}",
+            "phone_number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('phone_number', ``, 'number') }}",
+            "payment_history": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('payment_history', ``, 'string') }}",
+            "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('summary', ``, 'string') }}",
+            "credit_age": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('credit_age', ``, 'string') }}",
+            "inquiries": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('inquiries', ``, 'string') }}",
+            "credit_utilization": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('credit_utilization', ``, 'string') }}",
+            "credit_mix": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('credit_mix', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "discussion",
+              "displayName": "discussion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "First_name",
+              "displayName": "First_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Last_name",
+              "displayName": "Last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "payment_history",
+              "displayName": "payment_history",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "credit_age",
+              "displayName": "credit_age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "inquiries",
+              "displayName": "inquiries",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "credit_utilization",
+              "displayName": "credit_utilization",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "credit_mix",
+              "displayName": "credit_mix",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        -128
+      ],
+      "id": "e4212e16-1778-4fe5-b410-a5025d258a47",
+      "name": "PDF"
+    },
+    {
+      "parameters": {
+        "description": "Whenever a user calls the referral system, call this workflow",
+        "workflowId": {
+          "__rl": true,
+          "value": "5E7jXwMLVXoAA6vM",
+          "mode": "list",
+          "cachedResultName": "reffaral system"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "First_name": "={{ $('Telegram Trigger').item.json.message.chat.first_name }}",
+            "Last_name": "={{ $('Telegram Trigger').item.json.message.chat.last_name }}",
+            "Email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "First_name",
+              "displayName": "First_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "Last_name",
+              "displayName": "Last_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1200,
+        -128
+      ],
+      "id": "88237902-50c1-4f89-acbd-fa97b551cdfc",
+      "name": "referral system"
+    },
+    {
+      "parameters": {
+        "description": "Whenever the client tries to purchase something, this workflow will be called \ninformartion",
+        "workflowId": {
+          "__rl": true,
+          "value": "2OXqKsF8UAw2Wu0w",
+          "mode": "list",
+          "cachedResultName": "Payment"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "price_amount": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('price_amount', ``, 'number') }}",
+            "order_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('order_id', ``, 'string') }}",
+            "order_description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('order_description', ``, 'string') }}",
+            "customer_email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('customer_email', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "price_amount",
+              "displayName": "price_amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "order_description",
+              "displayName": "order_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "customer_email",
+              "displayName": "customer_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        -128
+      ],
+      "id": "2c0d8449-f4d7-48c0-ab72-19b7c8cfa9ae",
+      "name": "Payment"
+    },
+    {
+      "parameters": {
+        "description": "after running the payment modules run this to check the status of payment",
+        "workflowId": {
+          "__rl": true,
+          "value": "p2s8K2lPijoHcVfG",
+          "mode": "list",
+          "cachedResultName": "Payment Status"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Payment_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Payment_id', ``, 'string') }}",
+            "order_discription": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('order_discription', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Payment_id",
+              "displayName": "Payment_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "order_discription",
+              "displayName": "order_discription",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1552,
+        -128
+      ],
+      "id": "f77581b0-7429-466c-8370-633ec87cf2ef",
+      "name": "payment status"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Document', ``, 'string') }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Sheet', ``, 'string') }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1520,
+        672
+      ],
+      "id": "d4afe509-a12d-441f-a1d6-5d31f90fcbca",
+      "name": "general Leads",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HruLKU81RosPCn1P",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Document', ``, 'string') }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Sheet', ``, 'string') }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1696,
+        672
+      ],
+      "id": "6d188357-c0f4-45fa-9a23-8b4528b39b2d",
+      "name": "referral system1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HruLKU81RosPCn1P",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Modules \n",
+        "height": 208,
+        "width": 720,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        992,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "5419afaf-ea67-4794-9131-1a80ed224a28",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Telegram Setup\n",
+        "height": 1056,
+        "width": 1184
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -512,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "e6fc19e6-abbb-4ff3-957d-788e65bf86e1",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Main Agent's Tool\n",
+        "height": 256,
+        "width": 1088,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        768,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "e53cc479-f873-4f56-8217-2f92ffa5b404",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send Menu",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Callback Router",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email in Send Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Menu": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback Router": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Answer Query a callback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Answer Query a callback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Answer Query a callback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Answer Query a callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "referral system": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payment": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "payment status": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "general Leads": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "referral system1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "632524ae-e0ca-489e-8487-37546246605e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ad11e8c4392b848ffa61ea18deac972feac6489a85aba293e13653c89088ead0"
+  },
+  "id": "OZW26LSP1jahfqKj",
+  "tags": []
+}

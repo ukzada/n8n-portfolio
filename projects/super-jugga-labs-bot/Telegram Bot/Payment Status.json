@@ -1,0 +1,179 @@
+{
+  "name": "Payment Status",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Payment_id"
+            },
+            {
+              "name": "order_discription"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -144,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        496
+      ],
+      "id": "e1770f78-b993-4013-b3dc-61f97053cdbb",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "ZL4QchrYddYTNjoe",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2b5f4860-9f52-446b-b0e1-d85faa04ed7d",
+              "name": "Payment_Id",
+              "value": "={{ $json.Payment_id }}",
+              "type": "string"
+            },
+            {
+              "id": "bc4df69a-d8c0-472a-ace3-5948fb42c977",
+              "name": "order_description",
+              "value": "={{ $json.order_discription }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        304,
+        272
+      ],
+      "id": "cdc194bd-b479-4101-9c15-b225c24cf3bc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.price_amount }}{{ $json.order_id }}{{ $json.order_description }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        272
+      ],
+      "id": "87104da4-8c59-4735-9d65-fe0a3323def1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.nowpayments.io/v1/payment/{{ $('Edit Fields').item.json.Payment_Id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "Y6764EE-TZ4M99P-K6TY1S6-60Y2PSB"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        272
+      ],
+      "id": "14355f60-9584-4734-bc82-c416e19d3af0",
+      "name": "HTTP Request2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "020c8289-8b8d-4625-8f6a-c0f18ff0a346",
+  "meta": {
+    "instanceId": "ad11e8c4392b848ffa61ea18deac972feac6489a85aba293e13653c89088ead0"
+  },
+  "id": "p2s8K2lPijoHcVfG",
+  "tags": []
+}
