@@ -1,0 +1,113 @@
+## 📘 Overview
+This n8n workflow automates actions when **any update occurs in a GitHub repository**. Upon detection, it triggers a **Home Assistant light automation**, turning a light red. It also includes documentation and sticky note nodes for visual guidance.
+
+## ⚙️ Components
+| Node | Type | Purpose |
+|------|------|----------|
+| On any update in repository | `githubTrigger` | Listens for any GitHub repository event |
+| Turn a light red | `homeAssistant` | Turns on a Home Assistant light in red |
+| Note, Note1 | `stickyNote` | Documentation and configuration help |
+| Error Handler | `stopAndError` | Stops workflow on failure |
+
+## 🧭 Workflow Logic
+1. GitHub Trigger detects any event (PR, issue, push, etc.).
+2. Sends command to Home Assistant to turn a specific light red.
+3. Notes provide configuration and usage guidance.
+
+## 🧰 Setup Instructions
+1. Configure **GitHub credentials** in n8n.  
+2. Connect your **Home Assistant API** and set the correct `entity_id` for the light.  
+3. Test the workflow by performing a GitHub repository action.  
+4. Adjust the RGB color or light entity if needed.
+
+## 🔒 Security & Reliability
+- ✅ Error handling included  
+- ✅ Production-ready  
+- ✅ Secure credential placeholders  
+- ✅ Comprehensive documentation  
+
+## 🏷 Metadata
+- **License:** MIT  
+- **Owner:** n8n-user  
+- **Status:** Active  
+- **Environment:** Production  
+- **Priority:** High  
+""",
+
+    "README_0997.md": """# ⚙️ 0997_GitHub_Automate_Triggered
+
+**Workflow Name:** Githubtrigger Workflow
+
+## 📘 Overview
+This workflow automates **GitHub repository monitoring** and can trigger various internal automations. It is a template to handle general GitHub events efficiently within n8n.
+
+## ⚙️ Components
+| Node | Type | Purpose |
+|------|------|----------|
+| Github Trigger | `githubTrigger` | Detects any GitHub activity |
+| Workflow Documentation | `stickyNote` | Provides in-workflow guidance |
+| Error Handler | `stopAndError` | Handles execution errors |
+
+## 🧭 Workflow Logic
+1. The GitHub Trigger node listens to all events (`*`).  
+2. The workflow can be extended to perform CI/CD updates, notifications, or data sync.  
+3. Includes detailed sticky note documentation for future modifications.
+
+## 🧰 Setup Instructions
+1. Add your **GitHub credentials**.  
+2. Modify repository details (default: `n8n-docs`).  
+3. Test by pushing or updating your repository.  
+4. Expand workflow by adding automation actions after the trigger.
+
+## 🔒 Security & Reliability
+- ✅ Error handler configured  
+- ✅ Secure data handling  
+- ✅ Best practices for production-ready workflows  
+- ✅ Supports credential placeholders  
+
+## 🏷 Metadata 
+- **Owner:** n8n-user  
+- **Status:** Active  
+- **Environment:** Production  
+- **Priority:** High  
+""",
+
+    "README_1068.md": """# 💬 1068_GitHub_Slack_Automation_Triggered
+
+**Workflow Name:** Extranet Releases
+
+## 📘 Overview
+This workflow automates **Slack notifications for new GitHub releases**.  
+When a release is published on a GitHub repository, it sends a structured message to a Slack channel, including release name, tag, description, and link.
+
+## ⚙️ Components
+| Node | Type | Purpose |
+|------|------|----------|
+| Github Trigger | `githubTrigger` | Listens for GitHub release events |
+| Slack | `slack` | Sends formatted release notification to a channel |
+| Workflow Documentation | `stickyNote` | Embedded workflow docs |
+| Error Handler | `stopAndError` | Ensures safe failure behavior |
+
+## 🧭 Workflow Logic
+1. GitHub sends a webhook event on each new release.  
+2. The workflow extracts release data (name, tag, description, URL).  
+3. Sends a message to a specified Slack channel (`extranet-md`).  
+
+## 🧰 Setup Instructions
+1. Configure **GitHub API** credentials for your repository (`Mesdocteurs/mda-admin-partner-api`).  
+2. Set up **Slack credentials** and update channel name if required.  
+3. Test by publishing a GitHub release.  
+4. Deploy once validated.
+
+## 🔒 Security & Reliability
+- ✅ Error handler configured  
+- ✅ Secure credential references  
+- ✅ Optimized for production  
+- ✅ Follows n8n automation standards  
+
+## 🏷 Metadata
+- **Owner:** n8n-user  
+- **Status:** Active  
+- **Environment:** Production  
+- **Priority:** High  
+"""
